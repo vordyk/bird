@@ -1,3 +1,7 @@
+// by vordyk
+
+alert('space/left button mouse - jump) pause - esc or btn')
+
 let bird = new Image();
 let back = new Image();
 let road = new Image();
@@ -55,53 +59,68 @@ function reload() {
     }
 }
 
+let isGamePause = false;
+
+function game_pause() {
+    (isGamePause === false) ?
+        (isGamePause = true) : (isGamePause = false);
+}
+
+addEventListener("keydown", function (event) {
+    if (event.code == 'Escape') {
+        game_pause()
+    }
+});
+
 function draw() {
-    context.drawImage(back, 0, 0);
-    context.drawImage(bird, xPos, yPos);
+    if (isGamePause == false) {
+        context.drawImage(back, 0, 0);
+        context.drawImage(bird, xPos, yPos);
 
-    if (yPos >= canvas.height - road.height) {
-        reload()
+        if (yPos >= canvas.height - road.height) {
+            reload()
+        }
+        if (yPos <= 0) {
+            reload()
+        }
+
+        velY = velY + g;
+        yPos += velY;
+
+        for (let i = 0; i < pipe.length; i++) {
+            if (pipe[i].x < -pipeUp.width) {
+                pipe.shift()
+            } else {
+                context.drawImage(pipeUp, pipe[i].x, pipe[i].y);
+                context.drawImage(pipeBottom, pipe[i].x, pipe[i].y + pipeUp.height + gap);
+                pipe[i].x -= 2;
+            }
+            if (pipe[i].x == 80) {
+                pipe.push({
+                    x: canvas.width,
+                    y: Math.floor(Math.random() * pipeUp.height) - pipeUp.height
+                });
+            }
+
+            if (xPos + bird.width >= pipe[i].x &&
+                xPos <= pipe[i].x + pipeUp.width &&
+                (yPos <= pipe[i].y + pipeUp.height ||
+                    yPos + bird.height >= pipe[i].y + pipeUp.height + gap)) {
+                reload();
+                score = 0;
+            }
+
+            if (pipe[i].x == 0) {
+                score_audio.play();
+                score++;
+            }
+        }
+
+        context.drawImage(road, 0, canvas.height - road.height + 20);
+
+        score_text.innerHTML = "Score: " + score;
+        best_score_text.innerHTML = "Best Score: " + best_score;
     }
-    if (yPos <= 0) {
-        reload()
-    }
-
-    velY = velY + g;
-    yPos += velY;
-
-    for (let i = 0; i < pipe.length; i++) {
-        if (pipe[i].x < -pipeUp.width) {
-            pipe.shift()
-        } else {
-            context.drawImage(pipeUp, pipe[i].x, pipe[i].y);
-            context.drawImage(pipeBottom, pipe[i].x, pipe[i].y + pipeUp.height + gap);
-            pipe[i].x -= 2;
-        }
-        if (pipe[i].x == 80) {
-            pipe.push({
-                x: canvas.width,
-                y: Math.floor(Math.random() * pipeUp.height) - pipeUp.height
-            });
-        }
-
-        if (xPos + bird.width >= pipe[i].x &&
-            xPos <= pipe[i].x + pipeUp.width &&
-            (yPos <= pipe[i].y + pipeUp.height ||
-                yPos + bird.height >= pipe[i].y + pipeUp.height + gap)) {
-            reload();
-            score = 0;
-        }
-
-        if (pipe[i].x == 0) {
-            score_audio.play();
-            score++;
-        }
-    }
-
-    context.drawImage(road, 0, canvas.height - road.height + 20);
-
-    score_text.innerHTML = "Score: " + score;
-    best_score_text.innerHTML = "Best Score: " + best_score;
 }
 
 setInterval(draw, 20);
