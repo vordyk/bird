@@ -84,5 +84,4 @@ setInterval(draw, 20);
 addEventListener("mousedown", function () {
     velY = -5;
     fly_audio.play();
-
 });
