@@ -68,7 +68,7 @@ body {
     }
 
     .control {
-        padding-top: 20px;
+        padding-top: 0px;
         order: -1;
         /*order ставил методом тыка хех*/
     }
