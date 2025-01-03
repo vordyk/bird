@@ -19,6 +19,12 @@ score_audio.src = "audio/score.mp3";
 let canvas = document.getElementById("canvas");
 let context = canvas.getContext("2d");
 
+let score = 0;
+let best_score = 0;
+
+let score_text = document.getElementById("score");
+let best_score_text = document.getElementById("best_score");
+
 canvas.height = 512;
 canvas.width = 256;
 
@@ -35,15 +41,29 @@ pipe[0] = {
 }
 let gap = 100;
 
+function reload() {
+    xPos = 10;
+    yPos = 150;
+    velY = 0;
+    pipe = [];
+    pipe[0] = {
+        x: canvas.width,
+        y: 0
+    }
+    if (score > best_score) {
+        best_score = score;
+    }
+}
+
 function draw() {
     context.drawImage(back, 0, 0);
     context.drawImage(bird, xPos, yPos);
 
     if (yPos >= canvas.height - road.height) {
-        location.reload()
+        reload()
     }
     if (yPos <= 0) {
-        location.reload()
+        reload()
     }
 
     velY = velY + g;
@@ -64,24 +84,37 @@ function draw() {
             });
         }
 
-        if(xPos + bird.width >= pipe[i].x &&
+        if (xPos + bird.width >= pipe[i].x &&
             xPos <= pipe[i].x + pipeUp.width &&
             (yPos <= pipe[i].y + pipeUp.height ||
                 yPos + bird.height >= pipe[i].y + pipeUp.height + gap)) {
-                    location.reload();
-                }
+            reload();
+            score = 0;
+        }
 
         if (pipe[i].x == 0) {
             score_audio.play();
+            score++;
         }
     }
 
     context.drawImage(road, 0, canvas.height - road.height + 20);
+
+    score_text.innerHTML = "Score: " + score;
+    best_score_text.innerHTML = "Best Score: " + best_score;
 }
 
 setInterval(draw, 20);
 
+document.addEventListener("keydown", function moveUp(event) {
+    if (event.code == 'Space') {
+        velY = -4;
+        fly_audio.play();
+    }
+});
+
 addEventListener("mousedown", function () {
     velY = -5;
     fly_audio.play();
+
 });
