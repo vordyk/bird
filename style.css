@@ -56,6 +56,10 @@ body {
         width: 100%;
     }
 
+    .canvas {
+        width: 100%;
+    }
+
     .wrapper {
         display: flex;
         justify-content: center;
